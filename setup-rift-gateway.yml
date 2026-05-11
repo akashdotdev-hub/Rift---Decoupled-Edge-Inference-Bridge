@@ -1,0 +1,37 @@
+---
+- name: Provision Rift Hybrid Cloud Inference Bridge
+  hosts: localhost  # Change to your AWS IP if running remotely
+  become: yes       # Runs tasks with sudo privileges
+  vars:
+    project_dir: "/home/ec2-user/rift-ai-gateway"
+    app_user: "ec2-user"
+
+  tasks:
+    - name: 1. Update all system packages
+      package:
+        name: "*"
+        state: latest
+
+    - name: 2. Install core dependencies (Git, Python3, Pip)
+      package:
+        name:
+          - git
+          - python3
+          - python3-pip
+        state: present
+
+    - name: 3. Ensure project directory exists
+      file:
+        path: "{{ project_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: '0755'
+
+    - name: 4. Install required Python libraries
+      pip:
+        name:
+          - discord.py
+          - aiohttp
+          - python-dotenv
+        executable: pip3
